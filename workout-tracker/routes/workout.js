@@ -4,6 +4,15 @@ let router = express.Router();
 let mongoose = require('mongoose');
 let Workout = require('../models/workout');
 
+// Check if the user is authenticated
+function requireAuth(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+
+    res.redirect('/login');
+}
+
 /* Read Operation */
 router.get('/', async(req, res, next) => {
     try {
@@ -16,16 +25,14 @@ router.get('/', async(req, res, next) => {
     }
     catch(err) {
         console.log(err);
-        res.render('Workout/list', {
-            error: 'Error on Server'
-        });
+        next(err);
     }
 });
 
 /* Create/Add Operation */
 
 // Get Operation
-router.get('/add', async(req, res, next) => {
+router.get('/add', requireAuth, async(req, res, next) => {
     try {
         res.render('Workout/add', {
             title: 'Add Workout'
@@ -38,7 +45,7 @@ router.get('/add', async(req, res, next) => {
 });
 
 // Post Operation
-router.post('/add', async (req, res, next) => {
+router.post('/add', requireAuth, async(req, res, next) => {
     try {
         const newWorkout = new Workout({
             name: req.body.name,
@@ -58,8 +65,9 @@ router.post('/add', async (req, res, next) => {
 });
 
 /* Update Operation */
+
 // Get Operation
-router.get('/edit/:id', async(req, res, next) => {
+router.get('/edit/:id', requireAuth, async(req, res, next) => {
     try {
         const id = req.params.id;
         const workoutToEdit = await Workout.findById(id);
@@ -75,9 +83,8 @@ router.get('/edit/:id', async(req, res, next) => {
     }
 });
 
-
 // Post Operation
-router.post('/edit/:id', async(req, res, next) => {
+router.post('/edit/:id', requireAuth, async(req, res, next) => {
     try {
         let id = req.params.id;
 
@@ -90,9 +97,8 @@ router.post('/edit/:id', async(req, res, next) => {
             "notes": req.body.notes
         });
 
-        Workout.findByIdAndUpdate(id, updatedWorkout).then(() => {
-            res.redirect('/workouts');
-        });
+        await Workout.findByIdAndUpdate(id, updatedWorkout);
+        res.redirect('/workouts');
     }
     catch(err) {
         console.error(err);
@@ -100,21 +106,17 @@ router.post('/edit/:id', async(req, res, next) => {
     }
 });
 
-
 /* Delete Operation */
-router.get('/delete/:id', async(req, res, next) => {
+router.get('/delete/:id', requireAuth, async(req, res, next) => {
     try {
         let id = req.params.id;
 
-        Workout.deleteOne({ _id: id }).then(() => {
-            res.redirect('/workouts');
-        });
+        await Workout.deleteOne({ _id: id });
+        res.redirect('/workouts');
     }
     catch(err) {
         console.error(err);
-        res.render('Workout/list', {
-            error: 'Error on Server'
-        });
+        next(err);
     }
 });
 

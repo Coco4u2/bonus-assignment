@@ -1,0 +1,37 @@
+<!-- Shared header and navigation -->
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/main_nav.ejs') %>>
+
+<main class="container mt-5">
+    <div class="row">
+        <div class="offset-md-4 col-md-4 text-center">
+
+            <h1>Please Login</h1>
+
+            <p>Sign in to manage your workouts.</p>
+
+            <form action="/auth/google" method="GET">
+                <button type="submit"
+                    class="btn btn-danger w-100 mb-3">
+                    <i class="fab fa-google"></i>
+                    Login with Google
+                </button>
+            </form>
+
+            <form action="/auth/github" method="GET">
+                <button type="submit"
+                    class="btn btn-dark w-100 mb-3">
+                    <i class="fab fa-github"></i>
+                    Login with GitHub
+                </button>
+            </form>
+
+            <a href="/" class="btn btn-warning">
+                Cancel
+            </a>
+
+        </div>
+    </div>
+</main>
+<!-- Shared footer -->
+<%- include('../partials/footer.ejs') %>
